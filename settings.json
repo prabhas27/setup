@@ -1,0 +1,46 @@
+{
+    "workbench.colorTheme": "Solarized Light",
+    "remote.SSH.remotePlatform": {
+        "sjord66.ansys.com": "linux",
+        "sjord66": "linux"
+    },
+    "security.workspace.trust.untrustedFiles": "open",
+    "editor.tabCompletion": "on",
+    "open-file-from-path.regExp": "(?<=(\\s|^))\\/[^\\s]+",
+    "remote.SSH.serverInstallPath": {
+        "sjord66": "/nfs/sjord66.data/prkumar"
+    },
+    "git.openRepositoryInParentFolders": "always",
+    "search.smartCase": true,
+    "search.followSymlinks": false,
+    "search.mode": "reuseEditor",
+    "GitLive.Special branches": "main|master|trunk|dev|develop|qa|test|release[-/].*",
+    "GitLive.Issue tracker integration": "Disabled",
+    "[python]": {
+        "editor.formatOnType": true
+    },
+    "gitlens.views.commits.avatars": false,
+    "git.autofetch": true,
+    "gitlens.views.formats.commits.label": "${❰ tips ❱➤  }${email }${message }${date}",
+    "gitlens.views.commitDetails.files.layout": "tree",
+    "terminal.integrated.persistentSessionScrollback": 1000,
+    "terminal.integrated.scrollback": 10000,
+    "terminal.integrated.shellIntegration.suggestEnabled": true,
+    "terminal.integrated.copyOnSelection": true,
+    "terminal.integrated.cursorBlinking": true,
+    "yaml.schemas": {
+        "file:///nfs/sjord66.data/prkumar/.vscode-server/extensions/atlassian.atlascode-3.0.7/resources/schemas/pipelines-schema.json": "bitbucket-pipelines.yml"
+    },
+    "atlascode.bitbucket.enabled": true,
+    "atlascode.jira.enabled": false,
+    "gitlens.graph.layout": "editor",
+    "terminal.integrated.tabStopWidth": 4,
+    "terminal.integrated.allowChords": false,
+    "git-graph.date.type": "Commit Date",
+    "git-graph.defaultColumnVisibility": {
+        
+        "Date": true,
+        "Author": true,
+        "Commit": true
+    }
+}
