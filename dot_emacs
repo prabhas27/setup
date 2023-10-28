@@ -1,0 +1,456 @@
+(load-file "~/work/thk/dev/scripts/Linux/emacs")
+;; (customize-set-variable 'initial-buffer-choice (shell))
+(global-set-key "\C-^"    'enlarge-window)
+
+;; configure emacs-24 built-in cedet
+;; (global-ede-mode 1)
+;; (require 'semantic/sb)
+;; (require 'semantic/ia)
+;; (require 'semantic/bovine/gcc) ;; This is for GCC support
+;; (require 'srecode)
+;; (global-ede-mode 1)
+;; (semantic-mode 1)
+;; (global-semanticdb-minor-mode 1)
+;; (global-semantic-idle-scheduler-mode 1)
+;; (global-semantic-idle-completions-mode 1)
+;; (global-semantic-decoration-mode 1)
+;; (global-semantic-highlight-func-mode 1)
+;; (global-semantic-stickyfunc-mode -1)
+;; (global-semantic-idle-summary-mode 1)
+;; (global-semantic-mru-bookmark-mode 1)
+;; (semanticdb-enable-gnu-global-databases 'c-mode)
+;; (semanticdb-enable-gnu-global-databases 'c++-mode)
+(set-default 'semantic-case-fold t)
+;; (setq-mode-local c-mode semanticdb-find-default-throttle
+;;                  '(project unloaded system recursive))
+
+;; ;; Enable EDE package
+;; (global-ede-mode t)
+;; (ede-cpp-root-project "Tomahawk"
+;;                 :name "Tomahawk"
+;;                 :file "~/work/thk/dev/SConstruct"
+;;                 :include-path '("../ext"
+;;                                 "/"
+;;                                )
+;;                 :system-include-path '("../ext")
+;;                 :spp-table '(("isUnix" . "")
+;;                              ("BOOST_TEST_DYN_LINK" . "")))
+
+;; ;;
+;; (defun my-c-mode-cedet-hook ()
+;;  (local-set-key "." 'semantic-complete-self-insert)
+;;  (local-set-key ">" 'semantic-complete-self-insert)
+;;  (local-set-key [(control return)] 'semantic-ia-complete-symbol)
+;;  (local-set-key "\C-c?" 'semantic-ia-complete-symbol-menu)
+;;  (local-set-key "\C-c>" 'semantic-complete-analyze-inline)
+;;  (local-set-key "\C-cp" 'semantic-analyze-proto-impl-toggle))
+;; (add-hook 'c-mode-common-hook 'my-c-mode-cedet-hook)
+
+
+;; configure emacs-24 built-in cedet
+;; (global-ede-mode 1)
+;; (require 'semantic/sb)
+;; (require 'semantic/ia)
+;; (require 'srecode)
+
+;; select which submodes we want to activate
+(mapc (lambda (MODE) (add-to-list 'semantic-default-submodes MODE))
+      '(global-semantic-mru-bookmark-mode
+        global-semanticdb-minor-mode
+        global-semantic-idle-scheduler-mode
+        global-semantic-stickyfunc-mode
+        global-semantic-highlight-func-mode
+        global-semanticdb-minor-mode))
+
+;; Activate semantic
+(semantic-mode 1)
+
+
+;; customisation of modes
+(mapc
+ (lambda (MODE)
+   (add-hook MODE
+             (lambda ()
+               (when (boundp 'semantic-ia-complete-symbol) (add-to-list 'completion-at-point-functions 'semantic-ia-complete-symbol))
+               (local-set-key [(control return)] 'semantic-ia-complete-symbol-menu)
+               (local-set-key "\C-c?" 'semantic-ia-complete-symbol)
+               (local-set-key "\C-c>" 'semantic-complete-analyze-inline)
+               (local-set-key "\C-c=" 'semantic-decoration-include-visit)
+               (local-set-key "\C-cj" 'semantic-ia-fast-jump)
+               (local-set-key "\C-cq" 'semantic-ia-show-doc)
+               (local-set-key "\C-cs" 'semantic-ia-show-summary)
+               (local-set-key "\C-cp" 'semantic-analyze-proto-impl-toggle)
+               ))) '(c-mode-common-hook lisp-mode-hook emacs-lisp-mode-hook))
+
+(add-hook 'c-mode-common-hook
+          (lambda()
+            (local-set-key "\C-ct" 'ff-find-other-file)
+            (local-set-key "\C-c\C-r" 'semantic-symref)))
+
+(semanticdb-enable-gnu-global-databases 'c-mode t)
+(semanticdb-enable-gnu-global-databases 'c++-mode t)
+
+;; SRecode
+;; (global-srecode-minor-mode 1)
+
+;; EDE
+(global-ede-mode 1)
+(ede-enable-generic-projects)
+
+
+(when (require 'undo-tree nil 'noerror)
+  (global-undo-tree-mode)
+  (global-set-key [(control ?\.)] 'undo-tree-redo)
+  )
+
+(setq large-file-warning-threshold 200000000)
+
+
+
+; parenthesis matches
+(defun match-paren (arg)
+  "Go to the matching paren if on a paren; otherwise insert %."
+  (interactive "p")
+  (cond ((looking-at "\\s\(") (forward-list 1) (backward-char 1))
+        ((looking-at "\\s\)") (forward-char 1) (backward-list 1))
+        (t (self-insert-command (or arg 1)))))
+(global-set-key "%" 'match-paren)
+
+
+; kill other buffers
+(require 'cl)
+(defun kill-other-buffers ()
+  "Kill all other buffers."
+  (interactive)
+  (mapc 'kill-buffer (delq (current-buffer)
+                           (remove-if-not 'buffer-file-name (buffer-list)))))
+
+; kill all dired buffers
+(defun kill-all-dired-buffers()
+  "Kill all dired buffers."
+  (interactive)
+  (save-excursion
+    (let((count 0))
+      (dolist(buffer (buffer-list))
+        (set-buffer buffer)
+        (when (equal major-mode 'dired-mode)
+          (setq count (1+ count))
+          (kill-buffer buffer)))
+      (message "Killed %i dired buffer(s)." count ))))
+
+
+;; Force to use text mode for .diff to avoid unnecessary performance issue
+(setq auto-mode-alist (cons '("\\.diff$" . text-mode) auto-mode-alist))
+
+; also display column
+(setq column-number-mode t)
+
+
+;; ;; package installation/mantanence
+;; (require 'package)
+;; (require 'package)
+;; (add-to-list 'package-archives
+;;              '("melpa" . "http://melpa.milkbox.net/packages/") t)
+;; (add-to-list 'package-archives
+;;              '("marmalade" .
+;;                "http://marmalade-repo.org/packages/"))
+;; (package-initialize)
+
+
+;; (custom-set-variables
+;;  ;; custom-set-variables was added by Custom.
+;;  ;; If you edit it by hand, you could mess it up, so be careful.
+;;  ;; Your init file should contain only one such instance.
+;;  ;; If there is more than one, they won't work right.
+;;  '(case-fold-search t)
+;;  '(comint-completion-addsuffix t)
+;;  '(comint-input-ignoredups t)
+;;  '(comint-scroll-show-maximum-output t)
+;;  '(compilation-search-path (quote (".")))
+;;  '(current-language-environment "Latin-9")
+;;  '(custom-safe-themes
+;;    (quote
+;;     ("d7088a7105aa09cc68e3d058f89917e07e0505e0f4ab522a6045ec8092d67c44" default)))
+;;  '(default-input-method "latin-9-prefix")
+;;  '(global-font-lock-mode t nil (font-lock))
+;;  '(show-paren-mode t nil (paren)))
+;; (custom-set-faces
+;;  ;; custom-set-faces was added by Custom.
+;;  ;; If you edit it by hand, you could mess it up, so be careful.
+;;  ;; Your init file should contain only one such instance.
+;;  ;; If there is more than one, they won't work right.
+;;  )
+
+;; (add-to-list 'custom-theme-load-path "~/.emacs.d/elpa/moe-theme-20150129.2129/")
+;; (add-to-list 'load-path "~/.emacs.d/elpa/moe-theme-20150129.2129/")
+;; (require 'moe-theme)
+;; (moe-dark)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Prabhas customization
+;;(require 'gear-ext)
+(add-to-list 'load-path "~/.emacs.d/magit/lisp")
+(require 'magit)
+(global-set-key [f4] 'magit-status)
+(require 'gear-ext)
+(add-to-list 'load-path "~/.emacs.d/emacs.prk")
+
+(global-set-key [(control x) (k)] 'kill-this-buffer)
+
+(global-set-key "\M-g"    'find-file-at-point)
+(global-set-key "\C-\M-a" 'beginning-of-defun)
+(global-set-key "\M-,"   (read-kbd-macro "C-u M-."))
+
+;; (require 'xcscope)
+;; (cscope-setup)
+(global-set-key "\C-c1"  'cscope-set-initial-directory)
+(global-set-key "\C-c2"  'cscope-find-this-symbol)
+(global-set-key "\C-c3"  'cscope-find-global-definition)
+(global-set-key "\C-c4"  'cscope-find-this-text-string)
+(global-set-key "\C-c5"  'cscope-find-this-fi
+(global-set-key [f9] (lambda () (interactive) (switch-to-buffer "*cscope*")))
+(cscope-set-initial-directory (concat "/home/prkumar/sandboxes/gps/" (getenv "thk_area") "/thk/dev"))
+
+
+(add-hook 'comint-mode-hook
+  (lambda ()
+    (define-key comint-mode-map (kbd "M-p") 'comint-previous-matching-input-from-input)
+    (define-key comint-mode-map (kbd "M-n") 'comint-next-matching-input-from-input)))
+
+(blink-cursor-mode)
+
+
+;;can copy from emacs to other applications
+(when (eq window-system 'x)
+  (setq x-select-enable-clipboard t))
+
+
+;; (customize-set-variable 'initial-buffer-choice (shell))
+(fset 'yes-or-no-p 'y-or-n-p) ; Change confirmation from yes to y
+
+(global-superword-mode 1) ; Treat abc_def as one word for searches. C-s C-w would not highlight and search the word inclusive of underscore
+
+(windmove-default-keybindings 'meta) ; Use Meta-<ARROW> keys to move between windows
+
+; Renaming default shells (reason is next command)
+(global-set-key [f5] (lambda () (interactive) (shell "*shell_1*")))
+(global-set-key [f6] (lambda () (interactive) (shell "*shell_2*")))
+(global-set-key [f7] (lambda () (interactive) (shell "*shell_3*")))
+
+
+; Emacs 25 opens shell in a new window. Disabling it
+(add-to-list 'display-buffer-alist
+             '("^\\*shell_1\\*" . (display-buffer-same-window)))
+(add-to-list 'display-buffer-alist
+             '("^\\*shell_2\\*" . (display-buffer-same-window)))
+(add-to-list 'display-buffer-alist
+             '("^\\*shell_3\\*" . (display-buffer-same-window)))
+(add-to-list 'display-buffer-alist
+             '("^\\*cscope\\*" . (display-buffer-same-window)))
+
+; Do not clutter file tree with backups and autosaves
+(setq backup-directory-alist `(("." . "~/.emacs.d/backups")))
+(setq auto-save-file-name-transforms`((".*" ,"~/.emacs.d/backups" t)))
+
+
+
+;; change the default font
+;(set-frame-font "Monospace-18")
+;(add-to-list 'default-frame-alist '(font . "Monospace-28"))
+;; (set-frame-font "-misc-fixed-medium-r-normal--14-130-75-75-c-70-iso10646-1")
+;(add-to-list 'default-frame-alist '(font . "-misc-fixed-medium-r-normal--14-130-75-75-c-70-iso10646-1"))
+;(set-face-attribute 'default nil :background "black" :foreground "white" :font "Courier" :height 100)
+;; (set-face-attribute 'default nil :font "Courier" :height 200)
+;(set-frame-font "Courier" nil t)
+
+(set-frame-font "Monospace-12")
+(add-to-list 'default-frame-alist '(font . "Monospace-12"))
+
+
+;; (set-frame-font "-Misc-Fixed-normal-normal-normal-*-20-*-*-*-c-100-iso10646-1")
+
+;; Themes allow colors for fonts. Font size and typeg is not modified , usually
+(add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
+(load-theme 'suscolors t)
+(load-theme 'tsdh-dark t)
+
+;; Enable tag stack for faster code browsing
+(add-to-list 'load-path "~/.emacs.d/etags-stack/")
+(load "etags-stack.el")
+(global-set-key "\C-c6"  'etags-stack-show)
+
+;; (setq compile-command "thkd; scons -j 10 BUILD=Optimized")
+(setq compile-command (concat "cd /home/prkumar/sandboxes/rhsc/" (getenv "thk_area") "/thk/dev; scons -j 10 BUILD=Optimized"))
+
+;; Disable auto save of desktop
+;; (desktop-save-mode 1)
+;; (add-to-list 'desktop-path ".")
+
+;; (load-file "~/PrkScripts/emacs_setup.el")
+
+
+
+;; ediff
+(custom-set-variables
+ ;; '(ediff-window-setup-function 'ediff-setup-windows-plain)
+ ;; '(ediff-diff-options "-w")
+ '(ediff-split-window-function 'split-window-horizontally))
+
+;; toggle window
+(defun toggle-window-split ()
+  (interactive)
+  (if (= (count-windows) 2)
+      (let* ((this-win-buffer (window-buffer))
+	     (next-win-buffer (window-buffer (next-window)))
+	     (this-win-edges (window-edges (selected-window)))
+	     (next-win-edges (window-edges (next-window)))
+	     (this-win-2nd (not (and (<= (car this-win-edges)
+					 (car next-win-edges))
+				     (<= (cadr this-win-edges)
+					 (cadr next-win-edges)))))
+	     (splitter
+	      (if (= (car this-win-edges)
+		     (car (window-edges (next-window))))
+		  'split-window-horizontally
+		'split-window-vertically)))
+	(delete-other-windows)
+	(let ((first-win (selected-window)))
+	  (funcall splitter)
+	  (if this-win-2nd (other-window 1))
+	  (set-window-buffer (selected-window) this-win-buffer)
+	  (set-window-buffer (next-window) next-win-buffer)
+	  (select-window first-win)
+	  (if this-win-2nd (other-window 1))))))
+; Toggle window split
+(global-set-key (kbd "C-x |") `toggle-window-split)
+
+; Swap windows
+(global-set-key (kbd "C-x \\") `window-swap-states)
+
+(global-set-key (kbd "C-x t") (lambda (str) (interactive "sTitle :") (setq frame-title-format str)))
+;(global-set-key (kbd "C-,") `revert-buffer)
+(define-key global-map "\M-*" 'pop-tag-mark)
+(global-auto-revert-mode t)
+
+(global-linum-mode t)
+
+(setq x-select-enable-clipboard t)
+(setq interprogram-paste-function 'x-cut-buffer-or-selection-value)
+(setq mouse-drag-copy-region t)
+(setq x-select-enable-primary t)
+
+;; (setq vc-git-annotate-switches (list -w "-C"))     ; ;
+
+
+
+(defadvice c-lineup-arglist (around my activate)
+"Improve indentation of continued C++11 lambda function opened as argument."
+(setq ad-return-value
+(if (and (equal major-mode 'c++-mode)
+(ignore-errors
+(save-excursion
+(goto-char (c-langelem-pos langelem))
+;; Detect "[...](" or "[...]{". preceded by "," or "(",
+;;                      ;;   and with unclosed brace.
+(looking-at ".*[(,][ \t]*\\[[^]]*\\][ \t]*[({][^}]*$"))))
+0                           ; no additional indent
+ad-do-it)))                   ; default behavior
+
+
+
+
+
+
+;; ido
+(progn
+  (require 'ido)
+  ;; make buffer switch command do suggestions, also for find-file command
+  (ido-mode 1)
+  ;; (ido-everywhere 1)
+  (if ; make ido display choices vertically
+      (version< emacs-version "25")
+      (progn
+        (make-local-variable 'ido-separator)
+        (setq ido-separator "\n"))
+    (progn
+      (make-local-variable 'ido-decorations)
+      (setf (nth 2 ido-decorations) "\n")))
+  (setq ido-enable-flex-matching t) ; show any name that has the chars you typed
+  (setq ido-default-file-method 'selected-window) ; use current pane for newly opened file
+  (setq ido-default-buffer-method 'selected-window) ; use current pane for newly switched buffer
+  (define-key (cdr ido-minor-mode-map-entry) [remap write-file] nil) ; stop ido from suggesting when naming new file
+  )
+;; big minibuffer height, for ido to show choices vertically
+(setq max-mini-window-height 0.5)
+
+
+;; ibuffer
+(require 'ibuffer)
+(global-set-key (kbd "C-x C-b") 'ibuffer)
+(setq ibuffer-formats '((mark modified read-only " " (name 32 32 :left :elide) " "
+			      (size 6 -1 :right) " " (mode 16 16 :center)
+			       " " filename)
+			(mark " " (name 16 -1) " " filename))
+      ibuffer-eliding-string "&")
+(setq ibuffer-show-empty-filter-groups nil)
+(setq ibuffer-saved-filter-groups
+      '(("default"
+         ("version control" (or (mode . svn-status-mode)
+				(mode . svn-log-edit-mode)
+				(name . "^\\*svn-")
+				(name . "^\\*vc\\*$")
+				(name . "^\\*Annotate")
+				(name . "^\\*git-")
+				(name . "^\\*magit")
+				(name . "^\\*vc-")
+				(name . "^\\*cvs")))
+         ("emacs" (or (name . "^\\*scratch\\*$")
+                      (name . "^\\*Messages\\*$")
+                      (name . "^\\*Emacs\\*$")
+                      (name . "^\\*Global\\*$")
+                      (name . "^TAGS\\(<[0-9]+>\\)?$")
+                      (name . "^\\*Help\\*$")
+                      (name . "^\\*info\\*$")
+                      (name . "^\\*Occur\\*$")
+                      (name . "^\\*grep\\*$")
+                      (name . "^\\*Compile-Log\\*$")
+                      (name . "^\\*Backtrace\\*$")
+                      (name . "^\\*Process List\\*$")
+		      (name . "^\\*Disabled")
+		      (name . "^\\*Ediff")
+                      (name . "^\\*gud\\*$")
+                      (name . "^\\*Man")
+                      (name . "^\\*WoMan")
+                      (name . "^\\*Kill Ring\\*$")
+                      (name . "^\\*Completions\\*$")
+                      (name . "^\\*tramp")
+		      (name . "^\\*wl-compilation\\*$")
+                      (name . "^\\*compilation\\*$")
+		      (name . "^\\*cscope")
+		      ))
+         ("emacs source" (or (mode . emacs-lisp-mode)
+                             (filename . "/Applications/Emacs.app")
+                             (filename . "/bin/emacs")))
+	 ("Shell" (or (mode . shell-mode)))
+         ("agenda" (or (name . "^\\*Calendar\\*$")
+                       (name . "^diary$")
+                       (name . "^\\*Agenda")
+                       (name . "^\\*org-")
+                       (name . "^\\*Org")
+                       (mode . org-mode)
+                       (mode . muse-mode)))
+         ("dired" (or (mode . dired-mode)))
+	 ("SeaHawk qa" (filename . ".*/thk/qa/.*\\.\\(h\\|cc\\|py\\|pyt\\|diff\\|log\\|run_stats\\|def\\|lib\\|lib\\|gold\\)$"))
+	 ("SeaHawk python" (filename . ".*/thk/.*\\.\\(py\\)$"))
+	 ("SeaHawk" (filename . ".*/thk/.*\\.\\(h\\|cc\\)$"))
+	 )))
+(add-hook 'ibuffer-mode-hook
+          (lambda ()
+            (ibuffer-switch-to-saved-filter-groups "default")))
+;; Order the groups so the order is : [Default], [agenda], [emacs]
+(defadvice ibuffer-generate-filter-groups (after reverse-ibuffer-groups ()
+                                                 activate)
+  (setq ad-return-value (nreverse ad-return-value)))
+
+(message "***** Reached End *****")

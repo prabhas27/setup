@@ -1,0 +1,73 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "1. Gits pullre",
+            "type": "process",
+            "group": "build",
+            "command": "/appls/pkg/gear/linux_x86_64_rhel7/local/bin/gits",
+            "options": {
+              "cwd": "${workspaceFolder}/../",
+            },
+            "args": ["pullr"
+            ],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "icon": {
+                "id": "library",
+                "color": "terminal.ansiRed"
+              },
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
+            "label": "2. Build RHSC",
+            "type": "process",
+            "group": "build",
+            "command": "/appls/pkg/gear/linux_x86_64_rhel7/local/bin/scons",
+            "args": ["${input:build_type}",
+                     "-j", "${input:parallelism}", 
+                     "-k"
+            ],
+
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "icon": {
+                "id": "library",
+                "color": "terminal.ansiRed"
+              },
+            "problemMatcher": [
+                "$gcc"
+            ]           
+        },
+        {
+          "label": "Git Graph autostart",
+          "dependsOrder": "sequence",
+          "command": "${command:git-graph.view}",
+          "runOptions": { "runOn": "folderOpen" },
+        },
+    ],
+    "inputs": [
+        {
+           "id": "build_type",
+           "description": "build mode (Optimized, Release, Debug, Coverage)",
+           "type": "pickString",
+           "options": ["BUILD=Optimized", "BUILD=Release", "BUILD=Debug", "BUILD=Coverage"],
+           "default" : "BUILD=Optimized"
+         },
+         {
+           "id": "parallelism",
+           "description": "parallelism (8, 12, 16 e.t.c)",
+           "type": "pickString",
+           "options": ["4" , "8", "12", "16"],
+           "default" : "8"
+         },
+   ]
+}

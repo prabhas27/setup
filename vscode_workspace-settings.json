@@ -1,0 +1,48 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		}
+	],
+	"settings": {
+		"git.ignoreLimitWarning": true,
+		"python.languageServer": "Pylance",
+        "editor.tabCompletion": "on",
+		"files.associations": {
+			"limits": "cpp"
+		},
+		"files.exclude": {
+            "**/build/**": true,
+            "**/ext/**": true,
+            "**/qa/**": true,
+            "**/site-packages/**": true
+        },
+        "files.watcherExclude": {
+            "**/build/**": true,
+            "**/ext/**": true,
+            "**/qa/**": true,
+            "**/site-packages/**": true
+        },
+        "search.exclude": {
+            "**/build/**": true,
+            "**/ext/**": true,
+            "**/qa/**": true
+        },
+        "C_Cpp.codeAnalysis.exclude": {
+            "**/build/**": true,
+            "**/ext/**": true,
+            "**/qa/**": true
+        },
+        "atlascode.bitbucket.enabled": true,
+        "python.languageServer": "Pylance",
+        "terminal.integrated.profiles.linux": {
+            "bash": null,
+            "tmux": {
+                "path": "bash",
+                "args": ["-c", "tmux new -ADs work1"],
+                "icon": "terminal-tmux",
+            },
+        },
+        "terminal.integrated.defaultProfile.linux": "tmux",
+    }
+}
