@@ -29,7 +29,7 @@
     "terminal.integrated.copyOnSelection": true,
     "terminal.integrated.cursorBlinking": true,
     "yaml.schemas": {
-        "file:///nfs/sjord66.data/prkumar/.vscode-server/extensions/atlassian.atlascode-3.0.7/resources/schemas/pipelines-schema.json": "bitbucket-pipelines.yml"
+        "homedir/pipelines-schema.json": "bitbucket-pipelines.yml"
     },
     "atlascode.bitbucket.enabled": true,
     "atlascode.jira.enabled": false,
