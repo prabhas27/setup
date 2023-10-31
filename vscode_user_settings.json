@@ -1,14 +1,14 @@
 {
     "workbench.colorTheme": "Solarized Light",
     "remote.SSH.remotePlatform": {
-        "sjord66.ansys.com": "linux",
-        "sjord66": "linux"
+        "hostxyz": "linux",
+        "hostxyz": "linux"
     },
     "security.workspace.trust.untrustedFiles": "open",
     "editor.tabCompletion": "on",
     "open-file-from-path.regExp": "(?<=(\\s|^))\\/[^\\s]+",
     "remote.SSH.serverInstallPath": {
-        "sjord66": "/nfs/sjord66.data/prkumar"
+        "hostxyz": "homedir/path"
     },
     "git.openRepositoryInParentFolders": "always",
     "search.smartCase": true,
